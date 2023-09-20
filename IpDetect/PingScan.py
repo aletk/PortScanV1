@@ -1,18 +1,14 @@
-import IpDetect.GerarListIps as lst
-from concurrent.futures import ThreadPoolExecutor
 from scapy.layers.l2 import ARP
 from scapy.layers.inet import IP, ICMP, sr1, TCP
 import logging
-import ipwhois
-
-"""_PingScan_
-Classe para realizar o scan de um determinado host ou rede.
-"""
+import IpDetect.GerarListIps as lst
 
 
 class PingScan(lst.GerarListIps):
+    """_PingScan_
+    Classe para realizar o scan de um determinado host ou rede.
+    """
 
-    MAX_THREADS: int = 40
     FLAG: str = "S"
     DEFAULT_PORT: [int] = [80, 443, 22, 21, 20, 25, 53, 110, 143, 445, 3389]
     TIMEOUT: int = 1
@@ -21,11 +17,10 @@ class PingScan(lst.GerarListIps):
     def __init__(self, ip: str) -> None:
         super().__init__(ip)
 
-    """_scanIcmp_
-    Método que realiza um ping em todos os endereços de um determinado host    
-    """
-
     def ScanIcmp(self, ipdest: str) -> None:
+        """_scanIcmp_
+        Método que realiza um ping em todos os endereços de um determinado host    
+        """
         try:
             packet = IP(dst=ipdest) / ICMP(type="echo-request")
             response = sr1(packet, timeout=1, verbose=0)
@@ -35,12 +30,10 @@ class PingScan(lst.GerarListIps):
         except Exception as e:
             logging.error(f"Erro ao escanear {ipdest} com ICMP: {e}")
 
-    """_scanArp_
-    Método que faz uma busca na tabela arp para verificar se o host está online ou não trazendo junto meu MAC address 
-    """
-
     def ScanArp(self, ipDest: str) -> None:
-
+        """_scanArp_
+        Método que faz uma busca na tabela arp para verificar se o host está online ou não trazendo junto meu MAC address 
+        """
         try:
             arp_packet = ARP(pdst=ipDest)
             response = sr1(arp_packet, timeout=self.TIMEOUT,
@@ -51,11 +44,10 @@ class PingScan(lst.GerarListIps):
         except Exception as e:
             logging.error(f"Erro ao escanear {ipDest} com ARP: {e}")
 
-    """_scanTcp_
-    Portas Default: [80 : HTTP, 443 : HTTPS, 22 : SSH, 21 : FTP, 20 : FTP, 25 : SMTP, 53 : DNS, 110 : POP3, 143 : IMAP, 445 : SMB, 3389 : RDP]
-    """
-
     def ScanTcp(self, ipDest: tuple):
+        """_scanTcp_
+        Portas Default: [80 : HTTP, 443 : HTTPS, 22 : SSH, 21 : FTP, 20 : FTP, 25 : SMTP, 53 : DNS, 110 : POP3, 143 : IMAP, 445 : SMB, 3389 : RDP]
+        """
         try:
             packet_tcp = IP(dst=ipDest[0]) / \
                 TCP(dport=ipDest[1], flags=self.FLAG)
@@ -66,43 +58,22 @@ class PingScan(lst.GerarListIps):
             logging.error(
                 f"Erro ao escanear {ipDest}:{ipDest[1]} com TCP: {e}")
 
-    """_ExecuteScan_
-    Método responsável por executar o método correspondente a cada protocolo escolhido pelo usuário para realizar uma varredura no target
-    """
-
-    def ExecuteScan(self, typeScan: str) -> None:
-        try:
-            if "icmp" in typeScan:
-                scanner = self.ScanIcmp
-            elif "arp" in typeScan:
-                scanner = self.ScanArp
-            elif "tcp" in typeScan:
-                scanner = self.ScanTcp
-                self.IpList = [(ip, porta)
-                               for ip in self.IpList for porta in self.DEFAULT_PORT]
-            else:
-                raise ValueError("Tipo de scan não suportado.")
-
-            with ThreadPoolExecutor(max_workers=self.MAX_THREADS) as executor:
-                executor.map(scanner, self.IpList)
-        except Exception as e:
-            logging.error(f"Erro durante a execução do scan: {e}")
-
-    """_HandleResponse_
-    funções responsaveis por tratar o retorno das respostas 
-    """
-
     def GetSO(self, ttl):
 
-        if ttl == 32:
+        if ttl in range(27, 33):
             return "Windows 95/98"
-        elif ttl == 128:
+        elif ttl in range(123, 129):
             return "Windows 7/8/10/11"
-        elif ttl == 64:
+        elif ttl in range(60, 66):
             return "Unix/Linux/Mac"
-        return "SO not detect"
+        elif ttl in range(240, 256):
+            return "Linux/Mac"
+        return f"SO not detect{str(ttl)}"
 
     def HandleIcmpResponse(self, response):
+        """_HandleResponse_
+        funções responsaveis por tratar o retorno das respostas 
+        """
         print(
             f"[+] Host {response[IP].src} está ativo (IP: {response[IP].dst}) (SO: {self.GetSO(response[IP].ttl)})")
 
