@@ -2,6 +2,7 @@ from concurrent.futures import ThreadPoolExecutor
 import logging
 from IpDetect.PingScan import PingScan
 from Rdap.rdap import ConsultaRdap
+logging.basicConfig(level=logging.DEBUG)
 
 
 class Constroller():

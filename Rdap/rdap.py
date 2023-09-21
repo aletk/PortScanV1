@@ -6,10 +6,10 @@ import socket
 
 class ConsultaRdap(GerarListIps):
 
-    def __init__(self, ip):
+    def __init__(self, ip) -> None:
         super().__init__(ip)
 
-    def ConsultRdap(self):
+    def ConsultRdap(self) -> None:
         for ip in self.IpList:
             connectRdap = IPWhois(ip)
             resultRdap = connectRdap.lookup_rdap()

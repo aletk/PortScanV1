@@ -2,6 +2,7 @@ from scapy.layers.l2 import ARP
 from scapy.layers.inet import IP, ICMP, sr1, TCP
 import logging
 import IpDetect.GerarListIps as lst
+logging.basicConfig(level=logging.DEBUG)
 
 
 class PingScan(lst.GerarListIps):
@@ -70,18 +71,18 @@ class PingScan(lst.GerarListIps):
             return "Linux/Mac"
         return f"SO not detect{str(ttl)}"
 
-    def HandleIcmpResponse(self, response):
+    def HandleIcmpResponse(self, response: str) -> str:
         """_HandleResponse_
         funções responsaveis por tratar o retorno das respostas 
         """
         print(
             f"[+] Host {response[IP].src} está ativo (IP: {response[IP].dst}) (SO: {self.GetSO(response[IP].ttl)})")
 
-    def HandleArpResponse(self, response):
+    def HandleArpResponse(self, response: str) -> str:
         print(
             f"[+] ARP resposta de {response[ARP].psrc}, MAC: {response[ARP].hwsrc} (SO: {self.GetSO(response[IP].ttl)})")
 
-    def HandleSynScanTcp(self, response):
+    def HandleSynScanTcp(self, response: str) -> str:
         if response[TCP].flags == "SA":
             print(
                 f"[+] Porta Aberta : {response[TCP].sport}, IP: {response[IP].src} (SO: {self.GetSO(response[IP].ttl)})")

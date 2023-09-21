@@ -1,5 +1,7 @@
 import socket
 import re
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 
 class GerarListIps():
@@ -40,9 +42,12 @@ class GerarListIps():
         """_DnsResolver_
         Realiza uma busca no DNS do dominio informado e retorna o endereço encontrado
         """
-        self.IpParaConsulta = socket.gethostbyname(self.IpParaConsulta)
+        try:
+            self.IpParaConsulta = socket.gethostbyname(self.IpParaConsulta)
+        except Exception as e:
+            logging.log(f"Erro durante conversão de IP {e}")
 
-    def ListaDeIp(self):
+    def ListaDeIp(self) -> list[str]:
         """_ListDeIp_
         Retorna a lista de ips que serão informadas pelo usuário
         """
