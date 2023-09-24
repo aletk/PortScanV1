@@ -4,8 +4,8 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 
 
-class GerarListIps():
-    """_GerarListIps_
+class IpGenerator():
+    """_IpGenerator_
     Classe responsável por retornar e tratar o ip passado pelo usuário
     Returns:
         [ip,ip]
@@ -24,8 +24,8 @@ class GerarListIps():
         if self.ValidateIpOrName():
             self.DnsResolver()
 
-        loadRange: str = self.IpParaConsulta.split(".")[3]
-        cutIp: str = '.'.join(self.IpParaConsulta.split(".")[0:3])
+        loadRange: str = self.IpParaConsulta.split('.')[3]
+        cutIp: str = '.'.join(self.IpParaConsulta.split('.')[0:3])
 
         if loadRange.__contains__(self.IPRANGE):
             return [f"{cutIp}.{rangeIp}" for rangeIp in range(255)]

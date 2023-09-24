@@ -1,10 +1,10 @@
 from ipwhois import IPWhois
-from IpDetect.GerarListIps import GerarListIps
+from IpDetect.IpGenerator import IpGenerator
 import re
 import socket
 
 
-class ConsultaRdap(GerarListIps):
+class ConsultaRdap(IpGenerator):
 
     def __init__(self, ip) -> None:
         super().__init__(ip)

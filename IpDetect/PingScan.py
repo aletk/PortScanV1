@@ -1,19 +1,19 @@
 from scapy.layers.l2 import ARP
 from scapy.layers.inet import IP, ICMP, sr1, TCP
 import logging
-import IpDetect.GerarListIps as lst
+import IpDetect.IpGenerator as lst
 logging.basicConfig(level=logging.DEBUG)
 
 
-class PingScan(lst.GerarListIps):
+class PingScan(lst.IpGenerator):
     """_PingScan_
     Classe para realizar o scan de um determinado host ou rede.
     """
 
-    FLAG: str = "S"
-    DEFAULT_PORT: [int] = [80, 443, 22, 21, 20, 25, 53, 110, 143, 445, 3389]
-    TIMEOUT: int = 1
-    VERBOSE: int = 0
+    _FLAG: str = "S"
+    _DEFAULT_PORT: [int] = [80, 443, 22, 21, 20, 25, 53, 110, 143, 445, 3389]
+    _TIMEOUT: int = 1
+    _VERBOSE: int = 0
 
     def __init__(self, ip: str) -> None:
         super().__init__(ip)
@@ -37,8 +37,8 @@ class PingScan(lst.GerarListIps):
         """
         try:
             arp_packet = ARP(pdst=ipDest)
-            response = sr1(arp_packet, timeout=self.TIMEOUT,
-                           verbose=self.VERBOSE)
+            response = sr1(arp_packet, timeout=self._TIMEOUT,
+                           verbose=self._VERBOSE)
 
             if response:
                 self.HandleArpResponse(response)
@@ -51,7 +51,7 @@ class PingScan(lst.GerarListIps):
         """
         try:
             packet_tcp = IP(dst=ipDest[0]) / \
-                TCP(dport=ipDest[1], flags=self.FLAG)
+                TCP(dport=ipDest[1], flags=self._FLAG)
             response_tcp = sr1(packet_tcp, timeout=1, verbose=0)
             if response_tcp:
                 self.HandleSynScanTcp(response_tcp)

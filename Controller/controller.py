@@ -6,9 +6,9 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 class Constroller():
-    MAX_THREADS: int = 40
 
-    def __init__(self, typeConsult: str, ip: str) -> None:
+    def __init__(self, typeConsult: str, ip: str, maxThread) -> None:
+        self.Threads = maxThread
         self.Ip: str = ip
         self.TypeConsult: str = typeConsult
 
@@ -27,7 +27,7 @@ class Constroller():
         """
         try:
             whois = ConsultaRdap(self.Ip)
-            with ThreadPoolExecutor(max_workers=self.MAX_THREADS) as executor:
+            with ThreadPoolExecutor(max_workers=self.Threads) as executor:
                 executor.map(whois.ConsultRdap, whois.IpList)
             whois.ConsultRdap()
         except Exception as e:
@@ -47,11 +47,11 @@ class Constroller():
             elif "tcp" in typeScan:
                 scanner = pingScan.ScanTcp
                 pingScan.IpList = [(ip, porta)
-                                   for ip in pingScan.IpList for porta in pingScan.DEFAULT_PORT]
+                                   for ip in pingScan.IpList for porta in pingScan._DEFAULT_PORT]
             else:
                 raise ValueError("Tipo de scan não suportado.")
 
-            with ThreadPoolExecutor(max_workers=self.MAX_THREADS) as executor:
+            with ThreadPoolExecutor(max_workers=self.Threads) as executor:
                 executor.map(scanner, pingScan.IpList)
         except Exception as e:
             logging.error(f"Erro durante a execução do scan: {e}")
